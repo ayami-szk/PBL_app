@@ -4,6 +4,7 @@ import os
 
 import MeCab
 import sengiri
+import ipadic
 
 NEGATION = ('ない', 'ず', 'ぬ')
 PARELLEL_PARTICLES = ('か', 'と', 'に', 'も', 'や', 'とか', 'だの', 'なり', 'やら')
@@ -15,7 +16,7 @@ class Analyzer(object):
     def __init__(self, mecab_args=''):
         self.word_dict = json.load(open(os.path.join(DICT_DIR, 'pn_noun.json')))
         self.wago_dict = json.load(open(os.path.join(DICT_DIR, 'pn_wago.json')))
-        self.tagger = MeCab.Tagger(mecab_args)
+        self.tagger = MeCab.Tagger(ipadic.MECAB_ARGS)
         self.tagger.parse('')  # for avoiding bug
         self.mecab_args = mecab_args
 
@@ -84,7 +85,7 @@ class Analyzer(object):
             counts (list) : positive and negative counts per sentence
         """
         counts = []
-        for sentence in sengiri.tokenize(text, self.mecab_args):
+        for sentence in sengiri.tokenize(text, mecab_args=ipadic.MECAB_ARGS):
             count = {'positive': 0, 'negative': 0}
             polarities = self._calc_sentiment_polarity(sentence)
             for polarity in polarities:
@@ -103,7 +104,7 @@ class Analyzer(object):
             scores (list) : scores per sentence
         """
         scores = []
-        for sentence in sengiri.tokenize(text, self.mecab_args):
+        for sentence in sengiri.tokenize(text, mecab_args=ipadic.MECAB_ARGS):
             polarities = self._calc_sentiment_polarity(sentence)
             if polarities:
                 scores.append(sum(p[1] for p in polarities) / len(polarities))
@@ -119,7 +120,7 @@ class Analyzer(object):
             results (list) : analysis results
         """
         results = []
-        for sentence in sengiri.tokenize(text, self.mecab_args):
+        for sentence in sengiri.tokenize(text, mecab_args=ipadic.MECAB_ARGS):
             polarities = self._calc_sentiment_polarity(sentence)
             if polarities:
                 result = {
